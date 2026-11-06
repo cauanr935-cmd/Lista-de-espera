@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Todo dia tem uma surpresa. Uma delas abre a rede. Entra na lista de espera da Be My Mentor.">
+<meta property="og:title" content="bora puxar assunto?">
+<meta property="og:description" content="Todo dia tem uma surpresa. Uma delas abre a rede da Be My Mentor.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#EEF2F7">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>Lista de espera Be My Mentor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Caveat+Brush&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: mural de corredor. Tiras de papel quadriculado coladas sobre papel quadriculado, com a conversa do grupo da sala passando ao fundo. */
+:root {
+  --bg: #EEF2F7; --grid: #DCE3EC; --ink: #15181E; --muted: #566070;
+  --card: #FFFFFF; --line: #15181E;
+  --strip: #FBFCFE; --strip-grid: #D7E2EF; --strip-ink: #15181E;
+  --marker: #FFE14D; --pen: #2B57D9; --alarm: #E0393E; --warn: #F2A019; --calm: #1E9E62;
+  --bubble: #FFFFFF; --bubble-ink: #5A6372;
+  --me-bg: #2B57D9; --me-ink: #FFFFFF;
+  --raspa: #C3CAD4; --raspa-ink: #4B5361;
+  --tape: rgba(255, 225, 77, .75);
+  --terror-bg: #2A0C0E; --terror-ink: #FFE3E3; --terror-acc: #FF5A5F;
+  --news: #F6F3EA; --news-ink: #1D1B17;
+  --f-display: 'Caveat Brush', 'Comic Sans MS', 'Chalkboard SE', cursive;
+  --f-body: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11141A; --grid: #1B212B; --ink: #EEF1F5; --muted: #9AA3B2;
+    --card: #1A1F28; --line: #EEF1F5;
+    --bubble: #1D232E; --bubble-ink: #8D97A8;
+    --me-bg: #3A62D8; --me-ink: #FFFFFF; --pen: #8FA9FF;
+    --raspa: #4A5262; --raspa-ink: #D8DDE5;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11141A; --grid: #1B212B; --ink: #EEF1F5; --muted: #9AA3B2;
+  --card: #1A1F28; --line: #EEF1F5;
+  --bubble: #1D232E; --bubble-ink: #8D97A8;
+  --me-bg: #3A62D8; --me-ink: #FFFFFF; --pen: #8FA9FF;
+  --raspa: #4A5262; --raspa-ink: #D8DDE5;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--bg);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+* { box-sizing: border-box; }
+button, input { font: inherit; }
+:focus-visible { outline: 3px solid var(--pen); outline-offset: 3px; }
+
+/* conversa de fundo */
+.fundo { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.bolha {
+  position: absolute; max-width: 44vw; padding: 8px 12px; border-radius: 14px 14px 14px 4px;
+  background: var(--bubble); color: var(--bubble-ink); font-size: 14px; white-space: nowrap;
+  opacity: .62; box-shadow: 0 1px 0 var(--grid);
+  animation: flutua 12s ease-in-out infinite alternate;
+}
+.bolha.dir { border-radius: 14px 14px 4px 14px; }
+.bolha small { display: block; font-family: var(--f-mono); font-size: 10.5px; opacity: .8; }
+@keyframes flutua { to { transform: translateY(-18px); } }
+.digitando span { display: inline-block; animation: pisca 1.2s infinite; }
+.digitando span:nth-child(2) { animation-delay: .2s; }
+.digitando span:nth-child(3) { animation-delay: .4s; }
+
+.pagina {
+  position: relative; z-index: 1; max-width: 1000px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 56px;
+  display: grid; gap: 40px;
+}
+
+/* topo */
+.topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.selo {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px;
+  background: var(--strip); color: var(--strip-ink); border: 3px solid #FFFFFF; border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18); font-weight: 800; letter-spacing: .02em;
+}
+.selo i { width: 22px; height: 22px; border-radius: 50%; background: var(--marker); display: grid; place-items: center; font-style: normal; font-family: var(--f-display); font-size: 15px; }
+.contagem { font-family: var(--f-mono); font-size: 13px; color: var(--muted); background: var(--bg); padding: 4px 8px; }
+
+/* tiras de papel rasgado */
+.tira-wrap { filter: drop-shadow(0 3px 4px rgba(0,0,0,.22)); width: fit-content; max-width: 100%; }
+.tira {
+  margin: 0; padding: 14px 26px 12px; color: var(--strip-ink); background-color: var(--strip);
+  background-image: linear-gradient(var(--strip-grid) 1px, transparent 1px), linear-gradient(90deg, var(--strip-grid) 1px, transparent 1px);
+  background-size: 18px 18px;
+  font-family: var(--f-display); font-weight: 400; line-height: 1.02; text-wrap: balance;
+  clip-path: polygon(0% 6px, 4% 1px, 9% 5px, 14% 0, 20% 4px, 26% 1px, 31% 6px, 37% 2px, 43% 5px, 49% 0, 55% 4px, 61% 1px, 67% 6px, 73% 2px, 79% 5px, 85% 0, 91% 4px, 96% 1px, 100% 5px, 100% calc(100% - 4px), 95% 100%, 90% calc(100% - 5px), 84% calc(100% - 1px), 78% calc(100% - 6px), 72% calc(100% - 2px), 66% 100%, 60% calc(100% - 5px), 54% calc(100% - 1px), 48% calc(100% - 6px), 42% calc(100% - 2px), 36% 100%, 30% calc(100% - 4px), 24% calc(100% - 1px), 18% calc(100% - 6px), 12% calc(100% - 2px), 6% 100%, 0% calc(100% - 5px));
+}
+.r1 { transform: rotate(-1.6deg); }
+.r2 { transform: rotate(1.2deg); margin-left: clamp(8px, 6vw, 64px); }
+h1.tira { font-size: clamp(42px, 8.4vw, 82px); }
+.tira.media { font-size: clamp(30px, 5.4vw, 50px); }
+.cursor { animation: pisca 1s steps(1) infinite; }
+@keyframes pisca { 50% { opacity: 0; } }
+mark { background: var(--marker); color: var(--strip-ink); padding: 0 .12em; border-radius: 3px; }
+
+.heroi { display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 860px) { .heroi { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); } }
+.heroi-texto { display: grid; gap: 18px; min-width: 0; }
+.tracinhos { display: flex; gap: 6px; margin: 4px 0 -6px 10px; }
+.tracinhos b { width: 22px; height: 4px; background: var(--ink); border-radius: 2px; transform: rotate(-18deg); }
+.lede { max-width: 34em; font-size: 18px; background: var(--bg); padding: 6px 10px; margin: 0; }
+.acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none;
+  padding: 14px 22px; font-weight: 800; font-size: 18px; color: var(--strip-ink);
+  background: var(--marker); border: 2.5px solid var(--line); border-radius: 10px;
+  box-shadow: 5px 5px 0 var(--line); transition: transform .12s, box-shadow .12s;
+}
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 6px 6px 0 var(--line); }
+.btn:active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--line); }
+.btn svg { width: 20px; height: 20px; }
+.nota { font-size: 14px; color: var(--muted); background: var(--bg); padding: 2px 6px; }
+
+/* medidor */
+.medidor {
+  position: relative; background: var(--card); border: 2px solid var(--line); border-radius: 6px;
+  padding: 26px 20px 18px; display: grid; justify-items: center; gap: 4px; text-align: center;
+  transform: rotate(1.4deg);
+}
+.fita::before {
+  content: ""; position: absolute; top: -12px; left: 50%; width: 96px; height: 24px; margin-left: -48px;
+  background: var(--tape); transform: rotate(-3deg);
+}
+.rotulo { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-weight: 800; color: var(--muted); }
+.medidor svg { width: 100%; max-width: 240px; height: auto; }
+.nivel { font-family: var(--f-display); font-size: 34px; line-height: 1; }
+.medidor p { margin: 4px 0 0; font-size: 14px; color: var(--muted); max-width: 26em; }
+
+/* surpresas */
+.secao { display: grid; gap: 16px; }
+.secao-cab { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.secao-cab h2 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: clamp(32px, 5vw, 44px); line-height: 1; background: var(--bg); padding: 0 6px; }
+.proxima { font-family: var(--f-mono); font-size: 13px; color: var(--muted); background: var(--bg); padding: 4px 8px; font-variant-numeric: tabular-nums; }
+.dias { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 480px) { .dias { gap: 5px; } .dia strong { font-size: 24px; } .dia em { font-size: 10px; overflow-wrap: anywhere; line-height: 1.15; } .dia small { font-size: 10px; letter-spacing: .04em; } }
+.dia {
+  position: relative; display: grid; justify-items: center; gap: 0; padding: 8px 4px 6px; cursor: pointer;
+  background: var(--card); color: var(--ink); border: 2px solid var(--line); border-radius: 8px;
+}
+.dia small { font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+.dia strong { font-family: var(--f-display); font-weight: 400; font-size: 30px; line-height: 1.05; }
+.dia em { font-style: normal; font-size: 11px; color: var(--muted); }
+.dia.trancado { border-style: dashed; cursor: not-allowed; opacity: .7; background: var(--bg); }
+.dia.ativo { background: var(--marker); color: var(--strip-ink); box-shadow: 3px 3px 0 var(--line); }
+.dia.ativo small, .dia.ativo em { color: var(--strip-ink); }
+.dia.novo::after {
+  content: "novo"; position: absolute; top: -9px; right: -6px; padding: 1px 6px; border-radius: 999px;
+  background: var(--alarm); color: #FFFFFF; font-size: 10.5px; font-weight: 800; letter-spacing: .04em;
+}
+
+.palco {
+  position: relative; background: var(--card); color: var(--ink); border: 2px solid var(--line); border-radius: 6px;
+  padding: 30px clamp(18px, 4vw, 40px) 28px; min-height: 280px; display: grid; gap: 16px; align-content: start;
+}
+.palco-tag { font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); }
+.palco h3 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: clamp(30px, 4.6vw, 44px); line-height: 1.05; text-wrap: balance; }
+.palco p { margin: 0; max-width: 40em; }
+.palco .fonte { font-size: 13px; color: var(--muted); }
+.palco.terror { background: var(--terror-bg); color: var(--terror-ink); border-color: var(--terror-acc); }
+.palco.terror .palco-tag, .palco.terror .fonte { color: var(--terror-ink); opacity: .75; }
+.btn-sec {
+  justify-self: start; cursor: pointer; padding: 10px 18px; font-weight: 800; color: var(--ink);
+  background: transparent; border: 2px solid currentColor; border-radius: 999px;
+}
+.palco.terror .btn-sec { color: var(--terror-ink); }
+.btn-sec:hover { background: var(--marker); color: var(--strip-ink); border-color: var(--strip-ink); }
+.link-btn { justify-self: start; background: none; border: 0; padding: 0; color: var(--pen); text-decoration: underline; cursor: pointer; font-size: 14px; }
+
+/* dia 7 */
+.palpite { display: grid; gap: 10px; max-width: 520px; }
+.palpite output { font-family: var(--f-display); font-size: 56px; line-height: 1; font-variant-numeric: tabular-nums; }
+.palpite input[type=range] { width: 100%; accent-color: var(--pen); }
+.resposta { padding: 14px 16px; border-left: 5px solid var(--marker); background: var(--bg); display: grid; gap: 8px; max-width: 40em; }
+
+/* dia 8 */
+.barras { display: grid; gap: 12px; max-width: 620px; }
+.barra { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 12px; }
+.barra span { font-family: var(--f-mono); font-size: 14px; color: var(--muted); }
+.barra div { height: 34px; background: var(--ink); border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: var(--bg); font-weight: 800; font-variant-numeric: tabular-nums; transition: width 1.6s cubic-bezier(.3,.7,.2,1); }
+.barra.b2 div { background: var(--alarm); color: #FFFFFF; }
+.grande { font-family: var(--f-display); font-size: clamp(56px, 11vw, 104px); line-height: .95; color: var(--alarm); font-variant-numeric: tabular-nums; }
+
+/* dia 9 */
+.jornal { background: var(--news); color: var(--news-ink); padding: 18px clamp(14px, 3vw, 24px); border: 1px solid var(--news-ink); transform: rotate(-.6deg); max-width: 720px; }
+.jornal-cab { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; border-bottom: 3px double var(--news-ink); padding-bottom: 8px; margin-bottom: 12px; font-family: var(--f-mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; }
+.jornal-cab b { display: block; width: 100%; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(26px, 5vw, 38px); letter-spacing: 0; text-transform: none; line-height: 1.05; }
+.anuncios { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.anuncio { border: 1px solid var(--news-ink); padding: 10px 12px; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.35; }
+.anuncio b { display: block; font-family: var(--f-body); font-weight: 800; letter-spacing: .06em; font-size: 13px; margin-bottom: 4px; }
+.anuncio small { display: block; margin-top: 6px; font-family: var(--f-mono); font-size: 11.5px; }
+
+/* dia 10 */
+.cartaz { justify-self: start; width: min(100%, 340px); background: #EBD9B4; color: #3A2410; padding: 20px 18px; text-align: center; display: grid; gap: 8px; transform: rotate(-1.2deg); box-shadow: 0 6px 16px rgba(0,0,0,.25); border: 1px solid #B89A66; }
+.cartaz .procurado { font-family: Georgia, 'Times New Roman', serif; font-weight: 800; font-size: 44px; letter-spacing: .08em; line-height: 1; }
+.cartaz svg { width: 140px; height: 140px; justify-self: center; }
+.cartaz .nome { font-family: var(--f-display); font-size: 36px; line-height: 1; }
+.cartaz p { margin: 0; font-size: 14px; line-height: 1.35; }
+.cartaz .recompensa { font-family: Georgia, 'Times New Roman', serif; font-weight: 800; font-size: 20px; border-top: 2px solid #3A2410; padding-top: 8px; }
+
+/* dia 11 */
+.chat { max-width: 440px; border: 2px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--bg); }
+.chat-cab { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--card); border-bottom: 2px solid var(--line); }
+.chat-cab i { width: 30px; height: 30px; border-radius: 50%; background: var(--marker); display: grid; place-items: center; font-style: normal; font-family: var(--f-display); color: var(--strip-ink); }
+.chat-cab b { font-size: 14px; }
+.chat-cab small { display: block; font-size: 11.5px; color: var(--muted); }
+.msgs { display: grid; gap: 8px; padding: 14px; }
+.msg { max-width: 82%; padding: 8px 12px; border-radius: 16px 16px 16px 4px; background: var(--card); font-size: 15px; justify-self: start; }
+.msg.eu { justify-self: end; border-radius: 16px 16px 4px 16px; background: var(--me-bg); color: var(--me-ink); }
+.msg.entra { animation: entra .35s ease-out both; }
+@keyframes entra { from { opacity: 0; transform: translateY(8px); } }
+.mentor { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 8px; border-radius: 10px; background: var(--bg); }
+.mentor i { width: 28px; height: 28px; border-radius: 50%; background: var(--muted); filter: blur(2px); }
+.mentor span { display: grid; font-size: 13px; }
+.mentor .borrado { filter: blur(4px); user-select: none; }
+
+/* dia 12 */
+.quiz { display: grid; gap: 14px; max-width: 640px; }
+.pergunta { font-weight: 800; font-size: 18px; }
+.opcoes { display: grid; gap: 8px; }
+.opcao { text-align: left; cursor: pointer; padding: 12px 14px; border: 2px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); }
+.opcao:hover { background: var(--marker); color: var(--strip-ink); }
+.progresso { font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); }
+.resultado { display: grid; gap: 10px; padding: 18px; border: 2px solid var(--line); border-radius: 10px; background: var(--marker); color: var(--strip-ink); max-width: 560px; box-shadow: 5px 5px 0 var(--line); }
+.resultado b { font-family: var(--f-display); font-weight: 400; font-size: 42px; line-height: 1; }
+
+/* dia 13 */
+.terror-historia { font-size: clamp(20px, 3vw, 26px); line-height: 1.35; max-width: 30em; min-height: 3.2em; font-weight: 600; }
+
+/* dia 14 */
+.audio { display: flex; align-items: center; gap: 12px; max-width: 420px; padding: 10px 14px; border-radius: 18px 18px 18px 4px; background: var(--bg); border: 2px solid var(--line); }
+.play { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--ink); color: var(--bg); cursor: pointer; display: grid; place-items: center; }
+.play svg { width: 18px; height: 18px; }
+.onda { flex: 1; display: flex; align-items: center; gap: 3px; height: 36px; min-width: 0; }
+.onda i { flex: 1; background: var(--muted); border-radius: 2px; opacity: .55; }
+.onda i.on { background: var(--pen); opacity: 1; }
+.audio time { font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); }
+.transcricao { font-family: var(--f-mono); font-size: 15px; max-width: 40em; min-height: 3em; }
+.corte { color: var(--alarm); font-weight: 800; }
+
+/* dia 15 */
+.raspa { position: relative; max-width: 460px; border-radius: 12px; overflow: hidden; border: 2px solid var(--line); }
+.raspa-fundo { padding: 26px 22px; display: grid; gap: 8px; background: var(--marker); color: var(--strip-ink); }
+.raspa-fundo b { font-family: var(--f-display); font-weight: 400; font-size: 40px; line-height: 1; }
+.raspa canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+
+/* dia da abertura */
+.palco canvas.confete { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+.antes { display: grid; gap: 10px; }
+.antes .relogio { font-family: var(--f-mono); font-size: clamp(34px, 7vw, 56px); font-variant-numeric: tabular-nums; line-height: 1; }
+
+/* rodapé */
+.rodape { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; font-size: 14px; color: var(--muted); }
+.rodape span { background: var(--bg); padding: 2px 6px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 20;
+  transform: translateX(-50%); max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 10px;
+  background: var(--ink); color: var(--bg); font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25);
+}
+
+/* pop-up da lista de espera */
+.modal { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: rgba(15,18,24,.6); }
+.modal-caixa {
+  position: relative; width: min(100%, 420px); background: var(--card); color: var(--ink);
+  border: 2.5px solid var(--line); border-radius: 12px; box-shadow: 7px 7px 0 var(--line);
+  padding: 28px 24px 24px; display: grid; gap: 14px;
+}
+.modal-caixa h2 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 38px; line-height: 1.05; }
+.modal-caixa p { margin: 0; color: var(--muted); }
+.modal-fechar { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border: 0; background: none; color: var(--ink); font-size: 26px; line-height: 1; cursor: pointer; }
+.campo { display: grid; gap: 6px; }
+.campo label { font-weight: 800; font-size: 14px; }
+.campo input { padding: 12px 14px; font-size: 17px; color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 8px; }
+.campo input[aria-invalid="true"] { border-color: var(--alarm); }
+.erro { color: var(--alarm); font-size: 14px; min-height: 1.2em; margin: 0; }
+.modal-caixa .btn { justify-content: center; width: 100%; }
+.modal-caixa .btn:disabled { opacity: .6; cursor: wait; }
+.sucesso { text-align: center; justify-items: center; }
+.sucesso .emoji { font-size: 52px; line-height: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bolha, .cursor, .digitando span, .msg.entra { animation: none; }
+  .barra div { transition: none; }
+  .btn, .btn:hover, .btn:active { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="fundo" id="fundo" aria-hidden="true"></div>
+
+<main class="pagina">
+  <header class="topo">
+    <span class="selo"><i>b</i>Be My Mentor</span>
+    <span class="contagem" id="contagem">abre quando? segredo_</span>
+  </header>
+
+  <section class="heroi">
+    <div class="heroi-texto">
+      <div class="tracinhos" aria-hidden="true"><b></b><b></b><b></b></div>
+      <div class="tira-wrap r1"><h1 class="tira">a gente tá falando menos<span class="cursor">_</span></h1></div>
+      <div class="tira-wrap r2"><p class="tira media">bora puxar <mark>assunto</mark>?</p></div>
+      <p class="lede" id="lede">A Be My Mentor vai abrir para o Inteli: uma rede para você conversar com quem já passou pelo que você está passando. Quando? Não vamos contar. Pode ser amanhã, pode ser hoje à meia-noite. Entra na lista e recebe acesso ao bot na hora em que abrir.</p>
+      <div class="acoes">
+        <a class="btn" id="cta" target="_blank" rel="noopener">
+          <span id="cta-texto">Entrar na lista de espera</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <span class="nota">Tem surpresa nova aqui todo dia. Uma delas é a abertura.</span>
+      </div>
+    </div>
+
+    <aside class="medidor fita" aria-labelledby="medidor-rotulo">
+      <span class="rotulo" id="medidor-rotulo">nível de cortisol do Inteli</span>
+      <div id="medidor"></div>
+      <span class="nivel" id="nivel">ALTO CORTISOL</span>
+      <p id="nivel-nota">Cai um pouco a cada dia até a rede abrir.</p>
+    </aside>
+  </section>
+
+  <section class="secao" aria-labelledby="surpresas-titulo">
+    <div class="secao-cab">
+      <h2 id="surpresas-titulo">surpresa do dia_</h2>
+      <span class="proxima" id="proxima" aria-live="off"></span>
+    </div>
+    <div class="dias" id="dias" role="tablist" aria-label="Dias da campanha"></div>
+    <article class="palco fita" id="palco" aria-live="polite"></article>
+  </section>
+
+  <footer class="rodape">
+    <span>Be My Mentor · mentoria entre alunos do Inteli · feito pelo Cauan e pelo Bruno</span>
+    <span>#ApoioBruno</span>
+  </footer>
+</main>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <button class="modal-fechar" id="modal-fechar" type="button" aria-label="Fechar">×</button>
+    <form id="form-lista" novalidate style="display:grid;gap:14px">
+      <h2 id="modal-titulo">Entrar na lista de espera</h2>
+      <p>Só precisamos de duas informações.</p>
+      <div class="campo">
+        <label for="f-nome">Nome</label>
+        <input id="f-nome" name="nome" type="text" autocomplete="name" placeholder="Seu nome" required>
+      </div>
+      <div class="campo">
+        <label for="f-zap">WhatsApp</label>
+        <input id="f-zap" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 91234-5678" required>
+      </div>
+      <p class="erro" id="f-erro" role="alert"></p>
+      <button class="btn" id="f-enviar" type="submit">Entrar na fila</button>
+    </form>
+    <div class="sucesso" id="sucesso" hidden style="display:none;gap:12px">
+      <span class="emoji" aria-hidden="true">🎉</span>
+      <h2>Parabéns!</h2>
+      <p style="color:var(--ink);font-size:18px">Você está na fila de espera.</p>
+      <button class="btn-sec" id="sucesso-ok" type="button">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/* Curioso, hein? Quem lê código-fonte por diversão daria um ótimo herói do Git. Mas respeita o mistério. */
+
+/* ===== Ajuste aqui ===== */
+const SAVE_URL = '/api/inscrever';  // o servidor (server.js) repassa à planilha; a URL secreta fica no .env
+const LINK_LISTA = '';   // não usado mais: o botão abre o pop-up
+const LINK_BOT = '';     // link do bot, usado no dia da abertura (se vazio, o botão abre o pop-up)
+/* ======================= */
+
+const ABRE = atob('MjAyNi0xMS0xNg==');
+const SEMANA = ['sáb', 'dom', 'seg', 'ter', 'qua', 'qui', 'sex'];
+const DIAS = [
+  { d: '2026-11-07', w: 'sáb', n: 7,  nome: 'quantas palavras?', f: diaPalpite },
+  { d: '2026-11-08', w: 'dom', n: 8,  nome: '3.300',             f: diaDado },
+  { d: '2026-11-09', w: 'seg', n: 9,  nome: 'classificados',     f: diaClassificados },
+  { d: '2026-11-10', w: 'ter', n: 10, nome: 'procurado',         f: diaProcurado },
+  { d: '2026-11-11', w: 'qua', n: 11, nome: 'spoiler do bot',    f: diaBot },
+  { d: '2026-11-12', w: 'qui', n: 12, nome: 'herói de quê?',     f: diaQuiz },
+  { d: '2026-11-13', w: 'sex', n: 13, nome: 'sexta 13',          f: diaTerror },
+  { d: '2026-11-14', w: 'sáb', n: 14, nome: 'áudio vazado',      f: diaAudio },
+  { d: '2026-11-15', w: 'dom', n: 15, nome: 'raspadinha',        f: diaRaspa },
+  { d: ABRE, w: SEMANA[(Number(ABRE.slice(8)) - 7) % 7], n: Number(ABRE.slice(8)), nome: 'abriu', f: diaLancamento },
+];
+/* Calendário visível: 7 a 20/11 enquanto a rede não abre, para ninguém adivinhar o dia pelo tamanho da lista. */
+const CALENDARIO = Array.from({ length: 14 }, (_, k) => {
+  const n = 7 + k, d = `2026-11-${String(n).padStart(2, '0')}`;
+  return { d, n, w: SEMANA[k % 7] };
+});
+const reduz = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s, el = document) => el.querySelector(s);
+
+/* ---------- datas em São Paulo ---------- */
+function partesSP() {
+  const o = {};
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' })
+    .formatToParts(new Date()).forEach(p => { o[p.type] = p.value; });
+  return o;
+}
+function hojeReal() { const o = partesSP(); return `${o.year}-${o.month}-${o.day}`; }
+function hojeDaPagina() {
+  const m = location.hash.match(/^#bastidor-(\d{1,2})$/);
+  if (m) { const n = Number(m[1]); const dia = DIAS.find(x => x.n === n); if (dia) return dia.d; }
+  return hojeReal();
+}
+let hoje = hojeDaPagina();
+let selecionado = -1;
+
+/* ---------- memória do navegador (só conveniência) ---------- */
+function ler(chave, padrao) { try { const v = localStorage.getItem(chave); return v ? JSON.parse(v) : padrao; } catch (e) { return padrao; } }
+function gravar(chave, valor) { try { localStorage.setItem(chave, JSON.stringify(valor)); } catch (e) {} }
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(txt) { const t = $('#toast'); t.textContent = txt; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3200); }
+
+/* ---------- pop-up da lista de espera ---------- */
+const modal = $('#modal'), form = $('#form-lista'), sucesso = $('#sucesso'), erro = $('#f-erro');
+let focoAntes = null;
+function abreModal() {
+  focoAntes = document.activeElement;
+  form.hidden = false; form.style.display = 'grid';
+  sucesso.hidden = true; sucesso.style.display = 'none';
+  erro.textContent = '';
+  modal.hidden = false;
+  setTimeout(() => $('#f-nome').focus(), 0);
+}
+function fechaModal() { modal.hidden = true; if (focoAntes && focoAntes.focus) focoAntes.focus(); }
+$('#modal-fechar').addEventListener('click', fechaModal);
+$('#sucesso-ok').addEventListener('click', fechaModal);
+modal.addEventListener('mousedown', e => { if (e.target === modal) fechaModal(); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) fechaModal(); });
+
+$('#f-zap').addEventListener('input', e => {
+  const d = e.target.value.replace(/\D/g, '').slice(0, 11);
+  e.target.value = d.length > 7 ? `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`
+    : d.length > 2 ? `(${d.slice(0,2)}) ${d.slice(2)}` : d;
+});
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const nome = $('#f-nome').value.trim(), zap = $('#f-zap').value.trim(), digitos = zap.replace(/\D/g, '');
+  $('#f-nome').setAttribute('aria-invalid', String(nome.length < 2));
+  $('#f-zap').setAttribute('aria-invalid', String(digitos.length < 10));
+  if (nome.length < 2) { erro.textContent = 'Coloca seu nome.'; return; }
+  if (digitos.length < 10) { erro.textContent = 'Confere o número de WhatsApp (com DDD).'; return; }
+  erro.textContent = '';
+  const btn = $('#f-enviar'); btn.disabled = true; btn.textContent = 'Enviando...';
+  try {
+    if (!SAVE_URL) throw new Error('SAVE_URL vazio');
+    const r = await fetch(SAVE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, whatsapp: digitos }) });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.erro || 'falhou'); }
+    form.style.display = 'none'; sucesso.hidden = false; sucesso.style.display = 'grid';
+    form.reset(); $('#sucesso-ok').focus();
+  } catch (err) {
+    erro.textContent = err.message && err.message !== 'falhou' && !/fetch/i.test(err.message) ? err.message : 'Não deu pra enviar. Tenta de novo?';
+  } finally { btn.disabled = false; btn.textContent = 'Entrar na fila'; }
+});
+
+/* ---------- conversa de fundo ---------- */
+function montaFundo() {
+  const falas = [
+    ['já subiu pra main?', 'Grupo 5'], ['alguém tem o resumo?', 'Sala T3'], ['quem faz o deploy?!', 'Grupo 5'], ['CAIOOO', 'Grupo 5'],
+    ['o professor respondeu?', 'Módulo 4'], ['kkkkkkkk', 'Sala T3'], ['visualizado', ''], ['reunião 22h?', 'Grupo 2'],
+    ['alguém vivo?', 'Módulo 2'], ['quem apresenta amanhã?', 'Grupo 2'], ['bom dia grupo', 'Módulo 1'], ['manda áudio não, escreve', 'Sala T3'],
+    ['digitando', ''], ['alguém vai pro Inteli hoje?', 'Sala T3'],
+  ];
+  const pos = [[2,8],[66,3],[82,20],[3,40],[76,44],[8,66],[62,73],[84,86],[28,91],[42,13],[50,57],[0,86],[88,63],[20,23]];
+  const fundo = $('#fundo');
+  falas.forEach((f, i) => {
+    const b = document.createElement('div');
+    b.className = 'bolha' + (i % 3 === 1 ? ' dir' : '');
+    b.style.left = pos[i][0] + '%'; b.style.top = pos[i][1] + '%';
+    b.style.animationDelay = (-i * 1.7) + 's';
+    if (f[0] === 'digitando') { b.classList.add('digitando'); b.innerHTML = 'alguém está digitando<span>.</span><span>.</span><span>.</span>'; }
+    else { b.textContent = f[0]; if (f[1]) { const s = document.createElement('small'); s.textContent = f[1]; b.prepend(s); } }
+    fundo.appendChild(b);
+  });
+}
+
+/* ---------- medidor de cortisol ---------- */
+function nivelDoDia() {
+  const i = DIAS.findIndex(x => x.d === hoje);
+  if (hoje < DIAS[0].d) return 98;
+  if (i === -1 || hoje >= ABRE) return 6;
+  return Math.round(92 - i * 6.5);
+}
+function ponto(cx, cy, r, ang) { const a = ang * Math.PI / 180; return [cx + r * Math.cos(a), cy - r * Math.sin(a)]; }
+function arco(cx, cy, r, a1, a2) { const p1 = ponto(cx, cy, r, a1), p2 = ponto(cx, cy, r, a2); return `M${p1[0].toFixed(1)} ${p1[1].toFixed(1)} A${r} ${r} 0 0 1 ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`; }
+function montaMedidor() {
+  const L = nivelDoDia(), cx = 120, cy = 118, r = 92;
+  const ang = 180 - L * 1.8, ponta = ponto(cx, cy, r - 18, ang);
+  $('#medidor').innerHTML = `<svg viewBox="0 0 240 136" role="img" aria-label="Nível de cortisol: ${L} de 100">
+    <path d="${arco(cx, cy, r, 180, 122)}" stroke="var(--calm)" stroke-width="20" fill="none"/>
+    <path d="${arco(cx, cy, r, 118, 62)}" stroke="var(--warn)" stroke-width="20" fill="none"/>
+    <path d="${arco(cx, cy, r, 58, 0)}" stroke="var(--alarm)" stroke-width="20" fill="none"/>
+    <text x="14" y="134" font-size="11" font-weight="800" fill="var(--muted)" font-family="var(--f-body)">BAIXO</text>
+    <text x="226" y="134" font-size="11" font-weight="800" fill="var(--muted)" text-anchor="end" font-family="var(--f-body)">ALTO</text>
+    <line x1="${cx}" y1="${cy}" x2="${ponta[0].toFixed(1)}" y2="${ponta[1].toFixed(1)}" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="9" fill="var(--ink)"/>
+  </svg>`;
+  const nivel = $('#nivel');
+  if (L > 66) { nivel.textContent = 'ALTO CORTISOL'; nivel.style.color = 'var(--alarm)'; }
+  else if (L > 33) { nivel.textContent = 'MÉDIO CORTISOL'; nivel.style.color = 'var(--warn)'; }
+  else { nivel.textContent = 'BAIXO CORTISOL'; nivel.style.color = 'var(--calm)'; }
+  $('#nivel-nota').textContent = hoje >= ABRE ? 'Agora dá pra perguntar pra alguém. Respira.' : 'Cai um pouco a cada dia até a rede abrir.';
+}
+
+/* ---------- topo e botão ---------- */
+function montaTopo() {
+  const aberto = hoje >= ABRE;
+  $('#contagem').textContent = aberto ? 'tá aberto' : 'abre quando? segredo_';
+  const link = aberto ? LINK_BOT : '';
+  const cta = $('#cta');
+  $('#cta-texto').textContent = aberto ? 'Entrar na rede' : 'Entrar na lista de espera';
+  if (aberto) $('#lede').textContent = 'A Be My Mentor abriu para o Inteli. Entra, conta o que você precisa e conversa com quem já passou por isso.';
+  if (link) { cta.href = link; cta.removeAttribute('role'); cta.removeAttribute('tabindex'); cta.onclick = null; }
+  else {
+    cta.removeAttribute('href'); cta.setAttribute('role', 'button'); cta.tabIndex = 0;
+    cta.onclick = abreModal;
+    cta.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cta.onclick(); } };
+  }
+}
+
+/* ---------- dias ---------- */
+function ultimoAberto() { let u = -1; DIAS.forEach((x, i) => { if (x.d <= hoje) u = i; }); return u; }
+function montaDias() {
+  const vistos = ler('bmm-vistos', []);
+  const box = $('#dias'); box.innerHTML = '';
+  const visiveis = hoje >= ABRE ? CALENDARIO.filter(c => c.d <= ABRE) : CALENDARIO;
+  visiveis.forEach(c => {
+    const i = DIAS.findIndex(x => x.d === c.d);
+    const aberto = i !== -1 && c.d <= hoje;
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'dia'; b.setAttribute('role', 'tab');
+    b.id = 'dia-' + c.n;
+    b.innerHTML = `<small>${c.w}</small><strong>${c.n}</strong><em>${aberto ? DIAS[i].nome : '?'}</em>`;
+    if (!aberto) { b.classList.add('trancado'); b.setAttribute('aria-disabled', 'true'); b.title = 'Ainda trancado'; }
+    if (aberto && !vistos.includes(c.d) && i !== selecionado) b.classList.add('novo');
+    if (aberto && i === selecionado) { b.classList.add('ativo'); b.setAttribute('aria-selected', 'true'); } else b.setAttribute('aria-selected', 'false');
+    b.addEventListener('click', () => {
+      if (!aberto) { toast(`Calma! Essa abre ${c.w}, ${c.n}/11. Será que é a da rede?`); return; }
+      seleciona(i);
+    });
+    box.appendChild(b);
+  });
+}
+function seleciona(i) {
+  selecionado = i;
+  const vistos = ler('bmm-vistos', []);
+  if (!vistos.includes(DIAS[i].d)) { vistos.push(DIAS[i].d); gravar('bmm-vistos', vistos); }
+  montaDias();
+  const palco = $('#palco');
+  palco.className = 'palco fita';
+  const tag = DIAS[i].d === ABRE ? 'o dia chegou' : `surpresa nº ${i + 1}`;
+  palco.innerHTML = `<span class="palco-tag">${DIAS[i].w} ${DIAS[i].n}/11 · ${tag}</span><div class="corpo" style="display:grid;gap:16px"></div>`;
+  DIAS[i].f($('.corpo', palco), palco);
+}
+function palcoAntes() {
+  const palco = $('#palco');
+  palco.className = 'palco fita';
+  palco.innerHTML = `<div class="antes">
+    <span class="palco-tag">sáb 7/11 · surpresa nº 1</span>
+    <h3>A primeira surpresa abre amanhã.</h3>
+    <p>Sábado, 7/11, à meia-noite. Depois, uma nova por dia. E uma delas abre a rede.</p>
+    <span class="relogio" id="relogio-antes">--:--:--</span>
+  </div>`;
+}
+
+/* ---------- relógio da próxima surpresa ---------- */
+function segundosAteMeiaNoite() { const o = partesSP(); return 86400 - (Number(o.hour) * 3600 + Number(o.minute) * 60 + Number(o.second)); }
+function fmt(s) { const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60; return [h, m, ss].map(v => String(v).padStart(2, '0')).join(':'); }
+let diaVisto = hojeReal();
+function tique() {
+  const s = segundosAteMeiaNoite();
+  const prox = $('#proxima');
+  if (ultimoAberto() < DIAS.length - 1) prox.textContent = 'próxima surpresa em ' + fmt(s);
+  else prox.textContent = 'a rede abriu';
+  const r = $('#relogio-antes'); if (r) r.textContent = fmt(s);
+  const agora = hojeReal();
+  if (agora !== diaVisto) { diaVisto = agora; if (!location.hash.startsWith('#bastidor-')) { hoje = agora; inicia(); } }
+}
+
+/* ================= SURPRESAS ================= */
+
+function diaPalpite(el) {
+  el.innerHTML = `<h3>Quantas palavras você falou hoje?</h3>
+    <p>Chuta. Vale "bom dia", "kkkk" falado em voz alta e reclamação de prova.</p>
+    <div class="palpite">
+      <label for="palpite-range" class="rotulo">seu chute</label>
+      <output id="palpite-out" for="palpite-range">8.000</output>
+      <input type="range" id="palpite-range" min="0" max="25000" step="100" value="8000">
+      <button class="btn-sec" id="palpite-ver" type="button">Ver a resposta</button>
+    </div>
+    <div class="resposta" id="palpite-resp" hidden></div>`;
+  const r = $('#palpite-range', el), out = $('#palpite-out', el);
+  r.addEventListener('input', () => { out.textContent = Number(r.value).toLocaleString('pt-BR'); });
+  $('#palpite-ver', el).addEventListener('click', () => {
+    const v = Number(r.value), resp = $('#palpite-resp', el);
+    const veredito = v < 12700
+      ? 'Você chutou abaixo da média de 2019. Tá precisando puxar assunto.'
+      : 'Você chutou acima da média de 2019. Você é a pessoa que puxa assunto (alguém tem que ser).';
+    resp.innerHTML = `<p><b>${veredito}</b></p>
+      <p>Em 2005, a média era de cerca de 16 mil palavras faladas por dia. Em 2019, caiu para 12,7 mil.</p>
+      <p>E o Bruno? Ele passou o dia com um contador na mão. O resultado tá no nosso Reel de hoje.</p>
+      <p class="fonte">Estudo de Valeria Pfeifer e Matthias Mehl (Perspectives on Psychological Science, 2026), com dados dos EUA.</p>`;
+    resp.hidden = false;
+  });
+}
+
+function diaDado(el) {
+  el.innerHTML = `<h3>De 2005 a 2019, a gente parou de falar isso tudo por dia:</h3>
+    <div class="grande" id="dado-num">3.300</div>
+    <div class="barras" aria-label="Média de palavras faladas por dia">
+      <div class="barra"><span>2005</span><div style="width:100%">16.000</div></div>
+      <div class="barra b2"><span>2019</span><div id="barra-2019" style="width:79.4%">12.700</div></div>
+    </div>
+    <button class="btn-sec" id="dado-rodar" type="button">Rodar de novo</button>
+    <p>Uma queda de 28%. Entre quem tem menos de 25 anos, foi ainda maior. Os pesquisadores acham que o que mais sumiu foi a conversa pequena do dia a dia, tipo o "e aí, como foi a prova?" no corredor.</p>
+    <p class="fonte">Estudo de Valeria Pfeifer e Matthias Mehl (Perspectives on Psychological Science, 2026), com dados dos EUA. Mede palavras faladas, não solidão.</p>`;
+  const roda = () => {
+    const num = $('#dado-num', el), barra = $('#barra-2019', el);
+    if (reduz) return;
+    barra.style.transition = 'none'; barra.style.width = '100%';
+    requestAnimationFrame(() => requestAnimationFrame(() => { barra.style.transition = ''; barra.style.width = '79.4%'; }));
+    const t0 = performance.now();
+    const passo = t => { const p = Math.min(1, (t - t0) / 1600); num.textContent = Math.round(3300 * (1 - Math.pow(1 - p, 3))).toLocaleString('pt-BR'); if (p < 1) requestAnimationFrame(passo); };
+    requestAnimationFrame(passo);
+  };
+  $('#dado-rodar', el).addEventListener('click', roda);
+}
+
+function diaClassificados(el) {
+  el.innerHTML = `<h3>Saiu a primeira edição.</h3>
+    <div class="jornal">
+      <div class="jornal-cab"><b>Classificados do Inteli</b><span>edição nº 1</span><span>grátis</span><span>circulação: grupos da sala</span></div>
+      <div class="anuncios">
+        <div class="anuncio"><b>PROCURA-SE</b>Alguém que já sobreviveu ao Módulo 4 e explique sem julgar. Paga-se em café.<small>tratar com: ?</small></div>
+        <div class="anuncio"><b>TROCO</b>Resumo de cálculo por 10 minutos de ajuda com pitch. Sem compromisso, com muita ansiedade.<small>tratar com: ?</small></div>
+        <div class="anuncio"><b>PRECISA-SE</b>De veterano que diga, com sinceridade, se é pra trancar ou se é só a semana de provas.<small>tratar com: ?</small></div>
+        <div class="anuncio"><b>OFEREÇO</b>Ouvido para desabafo sobre trabalho em grupo. Já vem com "nossa, que absurdo" incluso.<small>tratar com: ?</small></div>
+      </div>
+    </div>
+    <p>Quem responde esses anúncios? No dia em que a rede abrir, a gente conta.</p>`;
+}
+
+function diaProcurado(el) {
+  el.innerHTML = `<div class="cartaz">
+      <span class="procurado">PROCURADO</span>
+      <svg viewBox="0 0 140 140" aria-hidden="true"><rect width="140" height="140" fill="#D9C399"/><circle cx="70" cy="56" r="26" fill="#3A2410"/><path d="M22 140c4-30 24-46 48-46s44 16 48 46z" fill="#3A2410"/><text x="70" y="66" text-anchor="middle" font-size="30" font-family="Georgia, serif" font-weight="800" fill="#D9C399">?</text></svg>
+      <span class="nome">Bruno</span>
+      <p><b>Crime:</b> puxar assunto com desconhecidos no Inteli.</p>
+      <p><b>Visto pela última vez:</b> perguntando "e aí, como foi a prova?" no corredor.</p>
+      <span class="recompensa">RECOMPENSA: EM BREVE</span>
+    </div>
+    <button class="btn-sec" id="vi" type="button">Eu vi esse homem</button>`;
+  $('#vi', el).addEventListener('click', () => toast('Todo mundo viu. Ele não para de falar da Be My Mentor.'));
+}
+
+function diaBot(el) {
+  const conversa = [
+    ['eu', 'oi, tô perdido no Módulo 4'],
+    ['bot', 'Relaxa, todo mundo passa por isso. É mais com o quê: código, grupo ou apresentação?'],
+    ['eu', 'código. git, pra ser sincero'],
+    ['bot', 'Achei gente que já passou pelo Módulo 4 e topa ajudar:<div class="mentor"><i></i><span><b class="borrado">Fulana Tal</b>3º ano · herói do Git</span></div><div class="mentor"><i></i><span><b class="borrado">Beltrano X</b>4º ano · já salvou 3 grupos</span></div>'],
+    ['bot', 'Quer puxar assunto com alguém?'],
+  ];
+  el.innerHTML = `<h3>Spoiler: é assim que você acha alguém.</h3>
+    <div class="chat">
+      <div class="chat-cab"><i>b</i><span><b>bot da Be My Mentor</b><small>cena ilustrativa · nomes borrados de propósito</small></span></div>
+      <div class="msgs" id="msgs"></div>
+    </div>
+    <button class="btn-sec" id="repetir" type="button">Ver de novo</button>`;
+  const msgs = $('#msgs', el);
+  const mostra = animar => {
+    msgs.innerHTML = '';
+    conversa.forEach((m, i) => {
+      const d = document.createElement('div');
+      d.className = 'msg' + (m[0] === 'eu' ? ' eu' : '') + (animar ? ' entra' : '');
+      if (animar) d.style.animationDelay = (i * 0.7) + 's';
+      d.innerHTML = m[1];
+      msgs.appendChild(d);
+    });
+  };
+  mostra(false);
+  $('#repetir', el).addEventListener('click', () => mostra(!reduz));
+}
+
+function diaQuiz(el) {
+  const perguntas = [
+    ['Seu grupo te chama às 23h. É pra quê?', [['o push não vai', 'git'], ['a IA fez tudo errado', 'ia'], ['alguém explica essa matéria?', 'prova'], ['quem apresenta amanhã?', 'pitch']]],
+    ['O que você mais ouve de colega?', [['"como você resolveu esse conflito?"', 'git'], ['"qual prompt você usou?"', 'ia'], ['"me passa seu resumo?"', 'prova'], ['"você fala bem, apresenta você"', 'pitch']]],
+    ['Seu superpoder escondido:', [['ler a mensagem de erro inteira', 'git'], ['fazer a IA trabalhar e revisar tudo depois', 'ia'], ['explicar qualquer coisa com um desenho', 'prova'], ['falar em público sem tremer (muito)', 'pitch']]],
+  ];
+  const herois = {
+    git: ['Herói do Git', 'Você é quem resolve o conflito às 23h59 enquanto o grupo inteiro pergunta se já subiu.'],
+    ia: ['Herói da IA', 'Você ensina a IA a trabalhar do jeito certo, e ainda revisa o PR no fim.'],
+    prova: ['Herói da prova', 'Seu resumo já salvou mais gente do que a monitoria.'],
+    pitch: ['Herói do pitch', 'Você transforma "não sei o que falar" em cinco minutos que convencem a banca.'],
+  };
+  const pontos = { git: 0, ia: 0, prova: 0, pitch: 0 };
+  let q = 0;
+  const desenha = () => {
+    if (q >= perguntas.length) {
+      const top = Object.keys(pontos).sort((a, b) => pontos[b] - pontos[a])[0];
+      gravar('bmm-heroi', top);
+      return resultado(top);
+    }
+    const [txt, ops] = perguntas[q];
+    el.innerHTML = `<h3>Você seria herói de quê?</h3>
+      <div class="quiz"><span class="progresso">pergunta ${q + 1} de 3</span><span class="pergunta">${txt}</span><div class="opcoes"></div></div>`;
+    const box = $('.opcoes', el);
+    ops.forEach(([o, k]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'opcao'; b.textContent = o;
+      b.addEventListener('click', () => { pontos[k]++; q++; desenha(); });
+      box.appendChild(b);
+    });
+  };
+  const resultado = k => {
+    el.innerHTML = `<h3>Você seria herói de quê?</h3>
+      <div class="resultado"><span class="rotulo" style="color:var(--strip-ink)">seu resultado</span><b>${herois[k][0]}</b><span>${herois[k][1]}</span></div>
+      <p>Quando a rede abrir, você pode ser esse herói para alguém de verdade. Tira print e marca a gente.</p>
+      <button class="btn-sec" id="refazer" type="button">Refazer</button>`;
+    $('#refazer', el).addEventListener('click', () => { Object.keys(pontos).forEach(x => pontos[x] = 0); q = 0; gravar('bmm-heroi', null); desenha(); });
+  };
+  const salvo = ler('bmm-heroi', null);
+  if (salvo && herois[salvo]) resultado(salvo); else desenha();
+}
+
+function diaTerror(el, palco) {
+  palco.classList.add('terror');
+  const historias = [
+    '23h58. A entrega é meia-noite. O push não vai. O grupo está digitando...',
+    'Você abre o PR. São 2.147 linhas. Ninguém sabe quem escreveu.',
+    'O professor pergunta: "alguém quer comentar?". Silêncio de 40 pessoas.',
+    'A apresentação é em 10 minutos e o notebook resolveu atualizar.',
+    'Você manda "alguém tem o resumo?" no grupo da sala. Visualizado por 38.',
+    'O grupo marcou reunião. Só você apareceu.',
+  ];
+  let i = 0;
+  el.innerHTML = `<h3>Sexta-feira 13: histórias de terror do Inteli</h3>
+    <p class="terror-historia" id="historia">${historias[0]}</p>
+    <button class="btn-sec" id="outra" type="button">Mais uma</button>
+    <p>Ninguém devia passar por isso sozinho. Falta pouco.</p>
+    <p class="fonte">Tem uma pior? Conta nos Stories do nosso Instagram.</p>`;
+  $('#outra', el).addEventListener('click', () => { i = (i + 1) % historias.length; $('#historia', el).textContent = historias[i]; });
+}
+
+function diaAudio(el) {
+  const palavras = 'Cauan… não manda isso no grupo ainda. A identidade não tá pronta. Se o pessoal vê isso agora a gente tá'.split(' ');
+  const barras = [8,14,22,30,18,26,34,20,12,28,32,16,24,30,10,22,34,26,14,20,30,18,12,24,28,16,8,20];
+  el.innerHTML = `<h3>Isso vazou do celular do Bruno.</h3>
+    <p>Ele ainda não sabe. Toca aí (é só a transcrição, sem som).</p>
+    <div class="audio">
+      <button class="play" id="play" type="button" aria-label="Tocar a transcrição do áudio"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg></button>
+      <div class="onda" id="onda">${barras.map(h => `<i style="height:${h}px"></i>`).join('')}</div>
+      <time>0:09</time>
+    </div>
+    <p class="transcricao" id="transc" aria-live="polite"></p>`;
+  let rodando = false;
+  $('#play', el).addEventListener('click', () => {
+    if (rodando) return; rodando = true;
+    const tr = $('#transc', el), bs = [...el.querySelectorAll('.onda i')];
+    tr.textContent = ''; bs.forEach(b => b.classList.remove('on'));
+    if (reduz) { tr.innerHTML = palavras.join(' ') + ' <span class="corte">[áudio cortado]</span>'; bs.forEach(b => b.classList.add('on')); rodando = false; return; }
+    let w = 0;
+    const iv = setInterval(() => {
+      if (w < palavras.length) { tr.textContent += (w ? ' ' : '') + palavras[w]; w++; bs.slice(0, Math.round(w / palavras.length * bs.length)).forEach(b => b.classList.add('on')); }
+      else { clearInterval(iv); tr.insertAdjacentHTML('beforeend', ' <span class="corte">[áudio cortado]</span>'); rodando = false; }
+    }, 280);
+  });
+}
+
+function diaRaspa(el) {
+  el.innerHTML = `<h3>Raspa aqui.</h3>
+    <p>Com o dedo ou com o mouse.</p>
+    <div class="raspa" id="raspa">
+      <div class="raspa-fundo"><b>a cara nova saiu_</b><span>A identidade da Be My Mentor tá no nosso Instagram hoje. E a rede? Deixa o celular perto amanhã.</span></div>
+      <canvas aria-hidden="true"></canvas>
+    </div>
+    <button class="link-btn" id="revelar" type="button">Revelar sem raspar</button>`;
+  const box = $('#raspa', el), cv = $('canvas', el), ctx = cv.getContext('2d');
+  const r = box.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  cv.width = Math.max(1, r.width * dpr); cv.height = Math.max(1, r.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const css = getComputedStyle(document.documentElement);
+  ctx.fillStyle = css.getPropertyValue('--raspa').trim() || '#C3CAD4';
+  ctx.fillRect(0, 0, r.width, r.height);
+  ctx.fillStyle = css.getPropertyValue('--raspa-ink').trim() || '#4B5361';
+  ctx.font = '30px "Caveat Brush", cursive'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('raspe aqui ✶', r.width / 2, r.height / 2);
+  ctx.globalCompositeOperation = 'destination-out';
+  let ativo = false;
+  const risca = e => { const b = cv.getBoundingClientRect(); ctx.beginPath(); ctx.arc(e.clientX - b.left, e.clientY - b.top, 24, 0, Math.PI * 2); ctx.fill(); };
+  cv.addEventListener('pointerdown', e => { ativo = true; try { cv.setPointerCapture(e.pointerId); } catch (_) {} risca(e); });
+  cv.addEventListener('pointermove', e => { if (ativo) risca(e); });
+  cv.addEventListener('pointerup', () => { ativo = false; });
+  cv.addEventListener('pointercancel', () => { ativo = false; });
+  $('#revelar', el).addEventListener('click', () => { cv.hidden = true; });
+}
+
+function diaLancamento(el, palco) {
+  const link = LINK_BOT;
+  el.innerHTML = `<h3>Tá aberto. Bora puxar assunto?</h3>
+    <p>A Be My Mentor abriu para o Inteli. Conta o que você precisa e conversa com quem já passou por isso. Ou entra para ser o herói de alguém.</p>
+    <a class="btn" id="cta-palco" ${link ? `href="${link}" target="_blank" rel="noopener"` : 'role="button" tabindex="0"'}>Entrar na rede</a>
+    <p class="fonte">Os Classificados, o cartaz do Bruno e o áudio vazado eram tudo sobre isso.</p>`;
+  if (!link) $('#cta-palco', el).addEventListener('click', abreModal);
+  if (reduz) return;
+  const cv = document.createElement('canvas'); cv.className = 'confete'; palco.appendChild(cv);
+  const r = palco.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  cv.width = r.width * dpr; cv.height = r.height * dpr;
+  const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const cores = ['#FFE14D', '#2B57D9', '#E0393E', '#1E9E62', '#F2A019'];
+  const ps = Array.from({ length: 90 }, () => ({ x: r.width / 2, y: r.height * .35, vx: (Math.random() - .5) * 9, vy: -Math.random() * 8 - 3, s: 4 + Math.random() * 5, c: cores[Math.floor(Math.random() * cores.length)], a: Math.random() * 6 }));
+  const t0 = performance.now();
+  const anda = t => {
+    c.clearRect(0, 0, r.width, r.height);
+    ps.forEach(p => { p.vy += .22; p.x += p.vx; p.y += p.vy; p.a += .2; c.save(); c.translate(p.x, p.y); c.rotate(p.a); c.fillStyle = p.c; c.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); c.restore(); });
+    if (t - t0 < 2600) requestAnimationFrame(anda); else cv.remove();
+  };
+  requestAnimationFrame(anda);
+}
+
+/* ---------- início ---------- */
+function inicia() {
+  montaTopo();
+  montaMedidor();
+  const u = ultimoAberto();
+  selecionado = u;
+  if (u === -1) { montaDias(); palcoAntes(); }
+  else seleciona(u);
+  tique();
+}
+montaFundo();
+inicia();
+setInterval(tique, 1000);
+addEventListener('hashchange', () => { hoje = hojeDaPagina(); inicia(); });
+</script>
+</body>
+</html>
