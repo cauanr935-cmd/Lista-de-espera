@@ -73,5 +73,24 @@ http.createServer(async (req, res) => {
     }
   }
 
+  if (req.method === 'GET' && url.pathname === '/api/surpresa') return require('./api/surpresa.js')(req, res);
+
+  // vídeos em /s/<nome>.mp4 (com Range, para o player poder avançar/voltar)
+  const m = url.pathname.match(/^\/s\/([a-f0-9]{24})\.mp4$/);
+  if (req.method === 'GET' && m) {
+    const arq = path.join(__dirname, 's', m[1] + '.mp4');
+    return fs.stat(arq, (err, st) => {
+      if (err) return responde(res, 404, { erro: 'não encontrado' });
+      const r = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
+      let ini = 0, fim = st.size - 1, status = 200;
+      if (r && (r[1] || r[2])) { status = 206; if (r[1]) { ini = +r[1]; if (r[2]) fim = Math.min(+r[2], fim); } else ini = Math.max(0, st.size - +r[2]); }
+      if (ini > fim) { res.writeHead(416, { 'Content-Range': `bytes */${st.size}` }); return res.end(); }
+      const h = { 'Content-Type': 'video/mp4', 'Accept-Ranges': 'bytes', 'Content-Length': fim - ini + 1 };
+      if (status === 206) h['Content-Range'] = `bytes ${ini}-${fim}/${st.size}`;
+      res.writeHead(status, h);
+      fs.createReadStream(arq, { start: ini, end: fim }).pipe(res);
+    });
+  }
+
   responde(res, 404, { erro: 'não encontrado' });
 }).listen(PORT, () => console.log(`Rodando em http://localhost:${PORT}`));

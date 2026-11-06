@@ -283,6 +283,11 @@ mark { background: var(--marker); color: var(--strip-ink); padding: 0 .12em; bor
   background: var(--ink); color: var(--bg); font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25);
 }
 
+/* vídeo da surpresa */
+.video-wrap { justify-self: start; width: min(100%, 380px); }
+.video-wrap video { display: block; width: 100%; max-height: 80vh; background: #000; border: 2.5px solid var(--line); border-radius: 12px; box-shadow: 5px 5px 0 var(--line); }
+.video-msg { margin: 0; padding: 40px 16px; text-align: center; color: var(--muted); border: 2px dashed var(--line); border-radius: 12px; }
+
 /* pop-up da lista de espera */
 .modal { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: rgba(15,18,24,.6); }
 .modal-caixa {
@@ -609,8 +614,27 @@ function tique() {
 
 /* ================= SURPRESAS ================= */
 
+/* O vídeo só existe para a página depois da meia-noite: o endereço vem de /api/surpresa, que checa a hora no servidor. */
+function carregaVideo(box) {
+  const tenta = async () => {
+    if (!box.isConnected) return; // trocou de dia: para de tentar
+    try {
+      const r = await fetch('/api/surpresa', { cache: 'no-store' });
+      if (r.ok) {
+        const { url } = await r.json();
+        box.innerHTML = '<video controls playsinline preload="metadata" aria-label="Vídeo da primeira surpresa"></video>';
+        $('video', box).src = url;
+        return;
+      }
+    } catch (_) {}
+    setTimeout(tenta, 4000); // relógio do aparelho adiantado ou rede fora: tenta de novo
+  };
+  tenta();
+}
+
 function diaPalpite(el) {
-  el.innerHTML = `<h3>Quantas palavras você falou hoje?</h3>
+  el.innerHTML = `<div class="video-wrap" id="video-wrap"><p class="video-msg">Carregando a surpresa…</p></div>
+    <h3>Quantas palavras você falou hoje?</h3>
     <p>Chuta. Vale "bom dia", "kkkk" falado em voz alta e reclamação de prova.</p>
     <div class="palpite">
       <label for="palpite-range" class="rotulo">seu chute</label>
@@ -619,6 +643,7 @@ function diaPalpite(el) {
       <button class="btn-sec" id="palpite-ver" type="button">Ver a resposta</button>
     </div>
     <div class="resposta" id="palpite-resp" hidden></div>`;
+  carregaVideo($('#video-wrap', el));
   const r = $('#palpite-range', el), out = $('#palpite-out', el);
   r.addEventListener('input', () => { out.textContent = Number(r.value).toLocaleString('pt-BR'); });
   $('#palpite-ver', el).addEventListener('click', () => {
