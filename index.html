@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Todo dia tem uma surpresa. Uma delas abre a rede. Entra na lista de espera da Be My Mentor.">
+<meta name="description" content="A Be My Mentor conecta estudantes universitários que precisam de ajuda a quem domina aquele assunto.">
 <meta property="og:title" content="bora puxar assunto?">
-<meta property="og:description" content="Todo dia tem uma surpresa. Uma delas abre a rede da Be My Mentor.">
+<meta property="og:description" content="Uma rede de mentoria entre estudantes universitários: aprenda, ensine e crie conexões reais.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#EEF2F7">
 <style>
@@ -164,6 +164,23 @@ mark { background: var(--marker); color: var(--strip-ink); padding: 0 .12em; bor
 .medidor svg { width: 100%; max-width: 240px; height: auto; }
 .nivel { font-family: var(--f-display); font-size: 34px; line-height: 1; }
 .medidor p { margin: 4px 0 0; font-size: 14px; color: var(--muted); max-width: 26em; }
+
+/* como funciona + perguntas frequentes */
+.explicacao { display: grid; gap: 18px; }
+.explicacao-cab { max-width: 720px; }
+.explicacao-cab h2 { margin: 0 0 8px; font-family: var(--f-display); font-weight: 400; font-size: clamp(38px, 6vw, 54px); line-height: 1; }
+.explicacao-cab p { margin: 0; font-size: 18px; }
+.passos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 0; margin: 0; list-style: none; }
+.passos li { position: relative; min-height: 126px; padding: 18px 16px 16px 58px; background: var(--card); border: 2px solid var(--line); border-radius: 10px; box-shadow: 4px 4px 0 var(--line); }
+.passos b { display: block; margin-bottom: 4px; font-size: 17px; }
+.passos span { font-size: 14px; color: var(--muted); }
+.passos i { position: absolute; top: 16px; left: 16px; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: var(--marker); color: var(--strip-ink); font-style: normal; font-weight: 800; }
+.faq { display: grid; gap: 8px; max-width: 760px; }
+.faq h3 { margin: 6px 0 2px; font-family: var(--f-display); font-size: 32px; font-weight: 400; line-height: 1; }
+.faq details { background: var(--card); border: 2px solid var(--line); border-radius: 8px; padding: 0 16px; }
+.faq summary { cursor: pointer; padding: 13px 28px 13px 0; font-weight: 800; }
+.faq p { margin: 0; padding: 0 0 15px; color: var(--muted); }
+@media (max-width: 680px) { .passos { grid-template-columns: 1fr; } .passos li { min-height: auto; } }
 
 /* surpresas */
 .secao { display: grid; gap: 16px; }
@@ -352,8 +369,8 @@ mark { background: var(--marker); color: var(--strip-ink); padding: 0 .12em; bor
         <video controls autoplay muted playsinline preload="auto" aria-label="Vídeo de apresentação da Be My Mentor"><source src="/s/4e7a1c9b2d5f8036a1b4c7e0.mp4" type="video/mp4"></video>
       </figure>
       <div class="lede" id="lede">
-        <p>A Be My Mentor junta quem tem dúvida com quem já passou por ela. Você pergunta, alguém que já viveu aquilo responde, e a conversa acontece de verdade.</p>
-        <p>Quem ensina e quem aprende ganham horas complementares pela troca de conhecimento, e cada conversa gera um certificado rastreável pela universidade.</p>
+        <p>A Be My Mentor é uma rede de mentoria entre estudantes universitários. Ela conecta quem precisa de ajuda em um tema a outro estudante que domina aquele assunto.</p>
+        <p>Você conta do que precisa; a gente encontra a pessoa certa para uma troca de conhecimento real.</p>
         <p>A Be My Mentor vai abrir para o Inteli. Quando? Não vamos contar: pode ser amanhã, pode ser hoje à meia-noite. Entra na lista e recebe acesso ao bot na hora em que abrir.</p>
       </div>
       <div class="acoes">
@@ -371,6 +388,33 @@ mark { background: var(--marker); color: var(--strip-ink); padding: 0 .12em; bor
       <span class="nivel" id="nivel">ALTO CORTISOL</span>
       <p id="nivel-nota">Cai um pouco a cada dia até a rede abrir.</p>
     </aside>
+  </section>
+
+  <section class="explicacao" aria-labelledby="explicacao-titulo">
+    <div class="explicacao-cab">
+      <h2 id="explicacao-titulo">como a Be My Mentor funciona?</h2>
+      <p>Uma pessoa pede ajuda. Outra, que já domina aquele assunto, compartilha o que sabe. A Be My Mentor faz essa ponte.</p>
+    </div>
+    <ol class="passos" aria-label="Etapas da mentoria">
+      <li><i>1</i><b>Você conta o que precisa</b><span>Uma dúvida de matéria, projeto, carreira ou qualquer tema em que outro estudante possa ajudar.</span></li>
+      <li><i>2</i><b>A gente encontra o match</b><span>No piloto, a equipe faz as conexões manualmente para garantir uma boa experiência.</span></li>
+      <li><i>3</i><b>A conversa acontece</b><span>Você aprende, ensina e cria uma conexão real com alguém da comunidade universitária.</span></li>
+    </ol>
+    <div class="faq" aria-labelledby="faq-titulo">
+      <h3 id="faq-titulo">perguntas frequentes_</h3>
+      <details>
+        <summary>O que o mentor ganha ao ajudar outro estudante?</summary>
+        <p>Além de compartilhar conhecimento e criar conexões, o mentor poderá receber horas complementares pelo tempo dedicado à mentoria. Estamos desenvolvendo uma forma confiável de validar essas horas junto às instituições de ensino.</p>
+      </details>
+      <details>
+        <summary>Posso participar agora?</summary>
+        <p>A plataforma ainda está em um piloto controlado. Estamos testando mentorias em pequena escala, aprimorando os matches e garantindo uma boa experiência antes de abrir para mais gente.</p>
+      </details>
+      <details>
+        <summary>A Be My Mentor é paga?</summary>
+        <p>Não para estudantes. A proposta é tornar a troca de conhecimento acessível, sem cobrar para que universitários possam aprender, ensinar e se conectar.</p>
+      </details>
+    </div>
   </section>
 
   <section class="secao" aria-labelledby="surpresas-titulo">
