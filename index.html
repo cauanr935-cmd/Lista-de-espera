@@ -289,6 +289,9 @@ mark { background: var(--marker); color: var(--strip-ink); padding: 0 .12em; bor
 .antes .relogio { font-family: var(--f-mono); font-size: clamp(34px, 7vw, 56px); font-variant-numeric: tabular-nums; line-height: 1; }
 
 /* rodapé */
+.saiba { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding: 8px 0 4px; }
+.saiba p { margin: 0; max-width: 34em; font-size: 18px; background: var(--bg); padding: 6px 10px; }
+.saiba .btn { font-size: 20px; padding: 16px 30px; }
 .rodape { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; font-size: 14px; color: var(--muted); }
 .rodape span { background: var(--bg); padding: 2px 6px; }
 
@@ -377,6 +380,14 @@ mark { background: var(--marker); color: var(--strip-ink); padding: 0 .12em; bor
     </div>
     <div class="dias" id="dias" role="tablist" aria-label="Dias da campanha"></div>
     <article class="palco fita" id="palco" aria-live="polite"></article>
+  </section>
+
+  <section class="saiba" aria-label="Saiba mais">
+    <p>Quer ver como essa ideia nasceu? Na nossa newsletter a gente conta como ela foi moldada ao longo de dois meses.</p>
+    <a class="btn" href="https://bemymentor.com.br/" target="_blank" rel="noopener">
+      <span>Saiba mais</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
   </section>
 
   <footer class="rodape">
