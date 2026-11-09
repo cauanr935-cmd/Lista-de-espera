@@ -22,7 +22,8 @@ module.exports = async (req, res) => {
   try {
     const d = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
     const nome = String(d.nome ?? '').trim().replace(/\s+/g, ' ');
-    const whatsapp = String(d.whatsapp ?? '').replace(/\D/g, '');
+    let whatsapp = String(d.whatsapp ?? '').replace(/\D/g, '').replace(/^0+/, '');
+    if (whatsapp.length > 11 && whatsapp.startsWith('55')) whatsapp = whatsapp.slice(2); // remove DDI do Brasil
     if (nome.length < 2 || nome.length > 80) return res.status(400).json({ erro: 'Nome inválido.' });
     if (whatsapp.length < 10 || whatsapp.length > 11) return res.status(400).json({ erro: 'WhatsApp inválido.' });
     const seguro = s => /^[=+\-@]/.test(s) ? "'" + s : s; // evita fórmula na planilha

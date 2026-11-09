@@ -462,15 +462,22 @@ $('#sucesso-ok').addEventListener('click', fechaModal);
 modal.addEventListener('mousedown', e => { if (e.target === modal) fechaModal(); });
 addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) fechaModal(); });
 
+// Tira o DDI 55 (autopreenchimento manda "+55 11 91234-5678") e zeros à esquerda; sobram DDD + número.
+const soNacional = v => {
+  let d = v.replace(/\D/g, '').replace(/^0+/, '');
+  if (d.length > 11 && d.startsWith('55')) d = d.slice(2);
+  return d.slice(0, 11);
+};
+
 $('#f-zap').addEventListener('input', e => {
-  const d = e.target.value.replace(/\D/g, '').slice(0, 11);
+  const d = soNacional(e.target.value);
   e.target.value = d.length > 7 ? `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`
     : d.length > 2 ? `(${d.slice(0,2)}) ${d.slice(2)}` : d;
 });
 
 form.addEventListener('submit', async e => {
   e.preventDefault();
-  const nome = $('#f-nome').value.trim(), zap = $('#f-zap').value.trim(), digitos = zap.replace(/\D/g, '');
+  const nome = $('#f-nome').value.trim(), zap = $('#f-zap').value.trim(), digitos = soNacional(zap);
   $('#f-nome').setAttribute('aria-invalid', String(nome.length < 2));
   $('#f-zap').setAttribute('aria-invalid', String(digitos.length < 10));
   if (nome.length < 2) { erro.textContent = 'Coloca seu nome.'; return; }

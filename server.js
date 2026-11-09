@@ -54,7 +54,8 @@ http.createServer(async (req, res) => {
     try {
       const d = JSON.parse(await lerCorpo(req));
       const nome = String(d.nome ?? '').trim().replace(/\s+/g, ' ');
-      const whatsapp = String(d.whatsapp ?? '').replace(/\D/g, '');
+      let whatsapp = String(d.whatsapp ?? '').replace(/\D/g, '').replace(/^0+/, '');
+    if (whatsapp.length > 11 && whatsapp.startsWith('55')) whatsapp = whatsapp.slice(2); // remove DDI do Brasil
       if (nome.length < 2 || nome.length > 80) return responde(res, 400, { erro: 'Nome inválido.' });
       if (whatsapp.length < 10 || whatsapp.length > 11) return responde(res, 400, { erro: 'WhatsApp inválido.' });
       // evita "fórmula" colada na planilha (=, +, -, @ no começo do texto)
